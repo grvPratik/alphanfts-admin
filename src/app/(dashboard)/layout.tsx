@@ -7,8 +7,7 @@ import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '../api/auth';
 const DashboardLayout = async({ children }: { children: React.ReactNode }) => {
-		const session = await getServerSession(authOptions);
-
+	const session = await getServerSession(authOptions);
 		if (!session) {
 			redirect("/login");
 		}
