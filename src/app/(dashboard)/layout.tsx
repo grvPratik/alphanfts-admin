@@ -3,8 +3,15 @@ import TeamSwitcher from './components/team-switcher';
 import { MainNav } from './components/main-nav';
 import { Search } from './components/search';
 import { UserNav } from './components/user-nav';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '../api/auth';
+const DashboardLayout = async({ children }: { children: React.ReactNode }) => {
+		const session = await getServerSession(authOptions);
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+		if (!session) {
+			redirect("/login");
+		}
     return (
 			<div className="flex flex-col">
 				<header>
