@@ -4,7 +4,7 @@ import connect from "@/database/connect";
 import Collection from "@/schema/collectionSchema";
 import { isValid, parseISO } from "date-fns";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+
 
 // Define the Filter interface
 interface Filter {

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { ModalProvider } from "@/provider/modal-provider";
 import LoginModal from "@/components/modals/login-modal";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 const LoginPage = async () => {
 	const session = await getServerSession(authOptions);

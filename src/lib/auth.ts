@@ -3,9 +3,9 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import Admin from "@/schema/adminSchema";
 import connect from "@/database/connect";
-import { NextAuthOptions } from "next-auth";
+import { AuthOptions } from "next-auth";
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: AuthOptions = {
 	providers: [
 		CredentialsProvider({
 			name: "credentials",
