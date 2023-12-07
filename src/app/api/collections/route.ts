@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import connect from "@/database/connect";
 import Collection from "@/schema/collectionSchema";
-import { isValid, parseISO } from "date-fns";
+import { isValid, parse, parseISO } from "date-fns";
 import { getServerSession } from "next-auth";
 
 
@@ -25,6 +25,19 @@ interface Filter {
 // Define the SortOrder type
 type SortOrder = 1 | -1;
 
+function parseDateString(dateString: string): Date | null {
+	const parsedDate = parse(dateString, "yyyy-MM-dd", new Date());
+
+	if (!isValid(parsedDate)) {
+		console.error(
+			"Invalid date format or value. Please provide a valid date in the format YYYY-MM-DD"
+		);
+		return null;
+	}
+
+	return parsedDate;
+}
+
 export async function GET(req: Request) {
 	try {
 		// Parse the request URL
@@ -38,8 +51,8 @@ export async function GET(req: Request) {
 		const search = searchParams.get("search") || "";
 		const sort = searchParams.get("sort") || "";
 		const order = searchParams.get("order");
-		const startDate = searchParams.get("startdate") || "";
-		const endDate = searchParams.get("enddate") || "";
+		const startDateString = searchParams.get("startdate") || "";
+		const endDateString = searchParams.get("enddate") || "";
 		const blockchain = searchParams.get("blockchain") || "";
 		const pageString = searchParams.get("page");
 		const perPageString = searchParams.get("items");
@@ -105,20 +118,24 @@ export async function GET(req: Request) {
 			filter.featured = false;
 		}
 
+		const startDate = parseDateString(startDateString);
+
+		const endDate = parseDateString(endDateString);
+
 		if (startDate) {
 			filter.mintDate = {
-				$gte: startDate ? parseISO(startDate) : undefined,
+				$gte: startDate ? new Date(startDate) : undefined,
 			};
 		}
 		if (endDate) {
 			filter.mintDate = {
-				$lte: endDate ? parseISO(endDate) : undefined,
+				$lte: endDate ? new Date(endDate) : undefined,
 			};
 		}
 		if (startDate && endDate) {
 			filter.mintDate = {
-				$gte: startDate ? parseISO(startDate) : undefined,
-				$lte: endDate ? parseISO(endDate) : undefined,
+				$gte: startDate ? new Date(startDate) : undefined,
+				$lte: endDate ? new Date(endDate) : undefined,
 			};
 		}
 
