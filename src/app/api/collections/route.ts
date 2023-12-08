@@ -2,9 +2,16 @@ import { NextResponse } from "next/server";
 
 import connect from "@/database/connect";
 import Collection from "@/schema/collectionSchema";
-import { isValid, parseISO } from "date-fns";
+import {
+	addDays,
+	endOfDay,
+	format,
+	isValid,
+	parse,
+	parseISO,
+	startOfDay,
+} from "date-fns";
 import { getServerSession } from "next-auth";
-
 
 // Define the Filter interface
 interface Filter {
@@ -12,10 +19,12 @@ interface Filter {
 		$regex: string;
 		$options: string;
 	};
-	mintDate?: {
-		$gte?: Date | undefined;
-		$lte?: Date | undefined;
-	};
+	mintDate?:
+		| {
+				$gte?: Date | undefined;
+				$lte?: Date | undefined;
+		  }
+		| Date;
 	blockchain?: string;
 	verified?: boolean | null;
 	whitelist?: boolean | null;
@@ -24,6 +33,55 @@ interface Filter {
 
 // Define the SortOrder type
 type SortOrder = 1 | -1;
+
+function checkDateFormat(dateString: string) {
+	const pattern = /^\d{4}-\d{2}-\d{2}$/;
+	return pattern.test(dateString);
+}
+function is_valid_date(str: string) {
+	const parts = str.split("-");
+	const day = parseInt(parts[2], 10);
+	const month = parseInt(parts[1], 10);
+	const year = parseInt(parts[0], 10);
+
+	if (isNaN(year) || isNaN(month) || isNaN(day)) {
+		// Invalid input format
+		return false;
+	}
+
+	// Check if the year is valid (arbitrary range used here)
+	if (year < 1000 || year > 3000) {
+		return false;
+	}
+
+	// Check if the month is between 1 and 12
+	if (month < 1 || month > 12) {
+		return false;
+	}
+
+	// Check if the day is within the valid range for the month and year
+	const daysInMonth = new Date(year, month - 1, 0).getDate();
+	if (day < 1 || day > daysInMonth) {
+		return false;
+	}
+
+	return true;
+}
+
+function parseDateString(dateString: string): Date | undefined | string {
+	if (is_valid_date(dateString) && dateString) {
+		const parsedDate = format(new Date(dateString), "yyyy,MM,dd");
+
+		return parsedDate;
+	}
+	return undefined;
+}
+function getNextDay(dateString: string) {
+	if (dateString && is_valid_date(dateString)) {
+		const nextDay = addDays(new Date(dateString), 1);
+		return format(nextDay, "yyyy,MM,dd");
+	}
+}
 
 export async function GET(req: Request) {
 	try {
@@ -38,11 +96,12 @@ export async function GET(req: Request) {
 		const search = searchParams.get("search") || "";
 		const sort = searchParams.get("sort") || "";
 		const order = searchParams.get("order");
-		const startDate = searchParams.get("startdate") || "";
-		const endDate = searchParams.get("enddate") || "";
+		const startDateString = searchParams.get("startdate") || "";
+		const endDateString = searchParams.get("enddate") || "";
 		const blockchain = searchParams.get("blockchain") || "";
 		const pageString = searchParams.get("page");
 		const perPageString = searchParams.get("items");
+		const exactDateString = searchParams.get("date") || "";
 
 		// Decode the search parameter
 		const decodedSearch = decodeURIComponent(search);
@@ -104,21 +163,53 @@ export async function GET(req: Request) {
 		} else if (featured === "false") {
 			filter.featured = false;
 		}
+		if (exactDateString && !is_valid_date(exactDateString)) {
+			return NextResponse.json({
+				success: false,
+				message: "Invalid date format",
+			});
+		}
+		if (startDateString && !is_valid_date(startDateString)) {
+			return NextResponse.json({
+				success: false,
+				message: "Invalid date format",
+			});
+		}
+		if (endDateString && !is_valid_date(endDateString)) {
+			return NextResponse.json({
+				success: false,
+				message: "Invalid date format",
+			});
+		}
 
-		if (startDate) {
+		const exactDate = parseDateString(exactDateString);
+
+		const startDate = parseDateString(startDateString);
+
+		const endDate = parseDateString(endDateString);
+
+		const exactDayEnd = getNextDay(exactDateString);
+
+		if (exactDate && !startDate && !endDate) {
 			filter.mintDate = {
-				$gte: startDate ? parseISO(startDate) : undefined,
+				$gte: exactDate ? startOfDay(new Date(exactDate)) : undefined,
+				$lte: exactDayEnd ? endOfDay(new Date(exactDayEnd)) : undefined,
 			};
 		}
-		if (endDate) {
+		if (startDate && !exactDate) {
 			filter.mintDate = {
-				$lte: endDate ? parseISO(endDate) : undefined,
+				$gte: startDate ? new Date(startDate) : undefined,
 			};
 		}
-		if (startDate && endDate) {
+		if (endDate && !exactDate) {
 			filter.mintDate = {
-				$gte: startDate ? parseISO(startDate) : undefined,
-				$lte: endDate ? parseISO(endDate) : undefined,
+				$lte: endDate ? new Date(endDate) : undefined,
+			};
+		}
+		if (startDate && endDate && !exactDate) {
+			filter.mintDate = {
+				$gte: startDate ? new Date(startDate) : undefined,
+				$lte: endDate ? new Date(endDate) : undefined,
 			};
 		}
 
