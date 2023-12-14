@@ -20,7 +20,10 @@ export async function GET(
 		// console.log(project)
 
 		if (!project) {
-			return new NextResponse("not found", { status: 400 });
+			return return NextResponse.json({
+				success: false,
+				result:"Not found"
+			})
 		}
 		return NextResponse.json(project);
 	} catch (error) {
