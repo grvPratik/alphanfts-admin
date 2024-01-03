@@ -1,15 +1,20 @@
 import React from "react";
-import TeamSwitcher from "./components/team-switcher";
-import { MainNav } from "./components/main-nav";
-import { Search } from "./components/search";
-import { UserNav } from "./components/user-nav";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "../../lib/auth";
+
+
+
+import TeamSwitcher from "@/components/dashboard/team-switcher";
+import { MainNav } from "@/components/dashboard/main-nav";
+import { Search } from "@/components/dashboard/search";
+import { UserNav } from "@/components/dashboard/user-nav";
+import { authOptions } from "@/lib/auth";
+
+
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
 	const session = await getServerSession(authOptions);
 	if (!session) {
-		redirect("/login");
+		 return redirect("/login");
 	}
 	return (
 		<div className="flex flex-col">

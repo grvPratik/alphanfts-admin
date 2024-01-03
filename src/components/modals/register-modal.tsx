@@ -37,12 +37,12 @@ const RegisterModal = () => {
 	});
 	const router = useRouter();
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
-		console.log(values);
+		
 		try {
 			// const { username, password } = values;
 			setLoading(true);
 			const res=	await axios.post("/api/register", values);
-            console.log("res", res);
+            
             
 			if ( res?.status === 401) {
 				toast.error("invalid username or password");

@@ -44,7 +44,7 @@ const LoginModal = () => {
 				password,
 				redirect: false,
 			});
-			console.log("res", res);
+			
 			if (res?.error && res?.status === 401) {
 				toast.error("invalid username or password");
 			}
@@ -52,7 +52,7 @@ const LoginModal = () => {
 			toast.error("Something went wrong");
 			console.log(error);
 		} finally {
-			console.log;
+			
 			router.push("/collections");
 			setLoading(false);
 		}

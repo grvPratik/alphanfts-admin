@@ -8,7 +8,7 @@ export default async function Register() {
 	const session = await getServerSession(authOptions);
 
 	if (!session) {
-		redirect("/login");
+		return redirect("/login");
 	}
 	return (
 		<div>

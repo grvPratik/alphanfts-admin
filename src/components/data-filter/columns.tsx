@@ -7,6 +7,7 @@ import { CellAction } from "./cell-action";
 import { Button } from "@/components/ui/button";
 
 export type ProductColumn = {
+	
 	slug: string;
 	name: string;
 	rating: number;

@@ -1,44 +1,59 @@
-import mongoose from "mongoose";
+import _mongoose, { connect } from "mongoose";
 
+declare global {
+	var mongoose: {
+		promise: ReturnType<typeof connect> | null;
+		conn: typeof _mongoose | null;
+	};
+}
 
-import Collection from "../schema/collectionSchema";
-import Admin from "@/schema/adminSchema";
+const MONGO_URI = process.env.MONGO_URI;
 
-const connect = async () => {
-	try {
-		const clusterUrl: any = process.env.MONGO_URI;
-		await mongoose.connect(clusterUrl);
-		console.log("Database connection completed");
-		
-	} catch (error) {
-		console.log(error);
-		throw new Error("Connection failed!");
+if (!MONGO_URI || MONGO_URI.length === 0) {
+	throw new Error("Please add your MongoDB URI to .env.local");
+}
+
+/**
+ * Global is used here to maintain a cached connection across hot reloads
+ * in development. This prevents connections from growing exponentially
+ * during API Route usage.
+ */
+let cached = global.mongoose;
+
+if (!cached) {
+	cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectDB() {
+	if (cached.conn) {
+		console.log("🚀 Using cached connection");
+		return cached.conn;
 	}
-};
 
-export default connect;
+	if (!cached.promise) {
+		const opts = {
+			bufferCommands: false,
+		};
 
-const sampleData = [
-	{
-		slug: "districtp",
-		name: "DistrictP",
-		description: "Welcome to DistrictP: Jungle Ventures 🌴",
-		blockchain: "solana",
-		imageUrl: "",
-		bannerUrl: "",
-		supply: 1111,
-		rating: 5,
-		whitelist: true,
-		featured: false,
-		verified: true,
-		requirement: "",
-		info: "",
-		roadmap: "",
-		mintPrice: "",
-		mintDate: null,
-		createdAt: new Date(),
-		x: "https://x.com/DistrictPsol",
-		discord: "https://discord.com/invite/districtp",
-		website: "",
-	},
-];
+		cached.promise = connect(MONGO_URI!, opts)
+			.then((mongoose) => {
+				console.log("✅ New connection established");
+				return mongoose;
+			})
+			.catch((error) => {
+				console.error("❌ Connection to database failed");
+				throw error;
+			});
+	}
+
+	try {
+		cached.conn = await cached.promise;
+	} catch (e) {
+		cached.promise = null;
+		throw e;
+	}
+
+	return cached.conn;
+}
+
+export default connectDB;

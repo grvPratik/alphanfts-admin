@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import Admin from "@/schema/adminSchema";
 import connect from "@/database/connect";
 import { AuthOptions } from "next-auth";
+import connectDB from "@/database/connect";
 
 export const authOptions: AuthOptions = {
 	providers: [
@@ -18,7 +19,7 @@ export const authOptions: AuthOptions = {
 				const { username, password }: any = credentials;
 
 				try {
-					await connect();
+					await connectDB();
 					const user = await Admin.findOne({ username });
 
 					if (!user) {

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 
 import connect from "@/database/connect";
-import Collection from "@/schema/collectionSchema";
-import { getServerSession } from "next-auth";
+import Project from "@/schema/projectSchema";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import connectDB from "@/database/connect";
 
 export async function GET(
 	req: Request,
@@ -14,18 +15,16 @@ export async function GET(
 			return new NextResponse("slug is required", { status: 400 });
 		}
 
-		connect();
+		await connectDB();
 
-		const project = await Collection.findOne({ slug: params.slug });
-		// console.log(project)
-
-		if (!project) {
+		const projectData = await Project.findOne({ slug: params.slug });
+		if (!projectData) {
 			return NextResponse.json({
 				success: false,
-				result:"Not found"
-			})
+				result: "Not found",
+			});
 		}
-		return NextResponse.json(project);
+		return NextResponse.json(projectData);
 	} catch (error) {
 		console.log("GET ERROR", error);
 		return new NextResponse("Internal error", { status: 500 });
@@ -43,13 +42,12 @@ export async function DELETE(
 		if (!session) {
 			return new NextResponse("Unauthorised", { status: 403 });
 		}
-		
 
 		if (!params.slug) {
 			return new NextResponse("slug is required", { status: 400 });
 		}
 
-		const deleteProject = await Collection.deleteOne({
+		const deleteProject = await Project.deleteOne({
 			slug: params.slug,
 		});
 
@@ -71,7 +69,6 @@ export async function PATCH(
 		if (!session) {
 			return new NextResponse("Unauthorised", { status: 403 });
 		}
-		// const { userId } = auth();
 
 		const body = await req.json();
 		// console.log(body)
@@ -82,25 +79,24 @@ export async function PATCH(
 			blockchain,
 			imageUrl,
 			bannerUrl,
-			supply,
+			review,
 			rating,
 			whitelist,
 			featured,
 			verified,
-			requirement,
-			info,
-			roadmap,
+
+			tags,
+
+			supply,
 			mintPrice,
 			mintDate,
 			startTime,
+
 			x,
 			discord,
 			website,
+			marketplace,
 		} = body;
-
-		// if (!userId) {
-		//   return new NextResponse("Unauthenticated", { status: 403 });
-		// }
 
 		if (!params.slug) {
 			return new NextResponse("slug is required", { status: 400 });
@@ -117,43 +113,46 @@ export async function PATCH(
 		if (!imageUrl) {
 			return new NextResponse("img id is required", { status: 400 });
 		}
-
-		const data = await Collection.findOne({ slug: params.slug });
-
-		// console.log(data);
-
-		if (!data) {
-			return new NextResponse("Document not found", { status: 404 });
+		const avail = await Project.findOne({ slug: params.slug });
+		if (!avail) {
+			return new NextResponse("not found", { status: 400 });
 		}
-		data.slug = slug;
-		data.name = name;
-		data.description = description;
-		data.blockchain = blockchain;
-		data.imageUrl = imageUrl;
-		data.bannerUrl = bannerUrl;
-		data.supply = supply;
-		data.rating = rating;
-		data.whitelist = whitelist;
-		data.featured = featured;
-		data.verified = verified;
-		data.requirement = requirement;
-		data.info = info;
-		data.roadmap = roadmap;
-		data.mintPrice = mintPrice;
-		data.mintDate = mintDate;
-		data.startTime = startTime;
-
-		data.x = x;
-		data.discord = discord;
-		data.website = website;
-
-		await data.save();
-
-		return NextResponse.json(data);
+		const result = await Project.findOneAndUpdate(
+			{ slug: params.slug }, // Query condition
+			{
+				$set: {
+					slug,
+					name,
+					description,
+					blockchain,
+					imageUrl,
+					bannerUrl,
+					review,
+					rating,
+					whitelist,
+					featured,
+					verified,
+					"mintInfo.supply": supply,
+					"mintInfo.mintPrice": mintPrice,
+					"mintInfo.startTime": startTime,
+					"mintInfo.mintDate": mintDate,
+					"social.discord": discord,
+					"social.x": x,
+					"social.marketplace": marketplace,
+					"social.website": website,
+					tags,
+				},
+			},
+			{ new: true }
+		);
+		// console.log(result.matchedCount);
+		// console.log(result.acknowledged);
+		// console.log(result);
+		// console.log(result.upsertedCount);
+	
+		return NextResponse.json(result);
 	} catch (error) {
 		console.log("[PATCH]", error);
 		return new NextResponse("Internal error", { status: 500 });
 	}
 }
-
-

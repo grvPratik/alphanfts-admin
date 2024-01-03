@@ -10,7 +10,7 @@ const LoginPage = async () => {
 	const session = await getServerSession(authOptions);
 	
 	if (session) {
-		redirect("/");
+		return redirect("/");
 	}
 	return (
 		<div>
