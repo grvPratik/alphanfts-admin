@@ -268,7 +268,7 @@ export async function POST(req: Request, res: Response) {
 			}
 		});
 		try {
-			const insertedProjects = await Promise.all(promises);
+		 await Promise.all(promises);
 		
 			// Proceed with further operations if needed
 		} catch (error) {

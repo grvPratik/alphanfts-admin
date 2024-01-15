@@ -53,7 +53,7 @@ const LoginModal = () => {
 			console.log(error);
 		} finally {
 			
-			router.push("/collections");
+			router.push("/projects");
 			setLoading(false);
 		}
 	};
