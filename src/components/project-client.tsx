@@ -48,7 +48,7 @@ const ProjectClient = () => {
 	};
 	const addClick = () => {
 		if (arr) {
-			const link = `https://nitter.net/${url}`;
+			const link = `https://nitter.cz/${url}`;
 			setArr([...arr, link]);
 			setUrl("");
 		}

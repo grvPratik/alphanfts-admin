@@ -25,6 +25,6 @@ export function convertToFullHttps (inputString:string){
 };
   
 export function nitterFromSlug(str: string) {
-	const url = `https://nitter.net/${str}`
+	const url = `https://nitter.cz/${str}`;
 	return url
 }
