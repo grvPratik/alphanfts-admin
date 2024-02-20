@@ -9,14 +9,16 @@ import {
 
 const scrapeTwitterAccounts = async (url: string) => {
 	try {
+		console.log(url)
 		const response = await fetch(url);
 		
 		const html = await response.text();
 		const dom = new JSDOM(html).window.document;
-
+console.log(dom)
 		const tweets: any = Array.from(dom.querySelectorAll(".profile-tabs")).map(
+		
 			(tweetNode) => {
-				
+					console.log("end")
 				// Extract tweet data here from tweetNode
 				// Example: const tweetText = tweetNode.querySelector('.tweet-text').textContent;
 				// Build the object with tweet information
@@ -55,6 +57,7 @@ const scrapeTwitterAccounts = async (url: string) => {
 							".profile-website span a"
 						) as HTMLAnchorElement
 					)?.href || "";
+				
 				return {
 					slugId,
 					fullName,

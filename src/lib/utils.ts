@@ -1,8 +1,8 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
- 
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+	return twMerge(clsx(inputs));
 }
 
 export function slugify(str: string) {
@@ -12,19 +12,19 @@ export function slugify(str: string) {
 		.replace(/[^\w-]+/g, "")
 		.replace(/--+/g, "-");
 }
-  
-export function convertToFullUrl (inputString:string){
+
+export function convertToFullUrl(inputString: string) {
 	const modifiedString = inputString.replace("/pic/", "");
 	return modifiedString;
-};
-  
-export function convertToFullHttps (inputString:string){
+}
+
+export function convertToFullHttps(inputString: string) {
 	const modifiedString = inputString.replace("/pic/", "");
 	const completeUrl = `https://${modifiedString}`;
 	return completeUrl;
-};
-  
+}
+
 export function nitterFromSlug(str: string) {
-	const url = `https://nitter.cz/${str}`;
-	return url
+	const url = `https://nitter.unixfox.eu/${str}`;
+	return url;
 }

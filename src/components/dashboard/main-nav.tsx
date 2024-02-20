@@ -9,23 +9,28 @@ export function MainNav({
 
   
   return (
-    <nav
-      className={cn("flex items-center space-x-4 lg:space-x-6", className)}
-      {...props}
-    >
-  
-      <Link
-        href="/projects"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-      >
-        Projects
-      </Link>
-      <Link
-        href="/setting"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-      >
-        Settings
-      </Link>
-    </nav>
-  )
+		<nav
+			className={cn("flex items-center space-x-4 lg:space-x-6", className)}
+			{...props}
+		>
+			<Link
+				href="/projects"
+				className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+			>
+				Projects
+			</Link>{" "}
+			<Link
+				href="/collections"
+				className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+			>
+			Collections
+			</Link>
+			<Link
+				href="/setting"
+				className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+			>
+				Settings
+			</Link>
+		</nav>
+	);
 }

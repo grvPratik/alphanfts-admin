@@ -19,7 +19,7 @@ const ProjectClient = () => {
 		// const enteredUrl = formData.get("url");
 		try {
 			setLoading(true);
-	
+
 			const response = await fetch("/api/projects", {
 				method: "POST",
 				body: JSON.stringify({ arr }), // Send the entered query as JSON
@@ -48,7 +48,7 @@ const ProjectClient = () => {
 	};
 	const addClick = () => {
 		if (arr) {
-			const link = `https://nitter.cz/${url}`;
+			const link = `https://nitter.unixfox.eu//${url}`;
 			setArr([...arr, link]);
 			setUrl("");
 		}
@@ -60,8 +60,8 @@ const ProjectClient = () => {
 
 	return (
 		<div className="flex ">
-			
-			<div className="flex w-80 flex-col gap-4  px-4 "><h1 className=" font-semibold text-4xl">Add project username</h1>
+			<div className="flex w-80 flex-col gap-4  px-4 ">
+				<h1 className=" font-semibold text-4xl">Add project username</h1>
 				<Input
 					type="url"
 					name="url"

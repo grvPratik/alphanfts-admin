@@ -18,7 +18,7 @@ interface ProductsClientProps {
 
 const FilterClient: React.FC<ProductsClientProps> = ({ data, title }) => {
 	const router = useRouter();
-	
+
 	return (
 		<div className="p-4 ">
 			<div className="flex items-center justify-between pb-7">
@@ -26,7 +26,6 @@ const FilterClient: React.FC<ProductsClientProps> = ({ data, title }) => {
 					title={title}
 					description="Manage NFT Collection for your website"
 				/>
-				
 			</div>
 			<Separator />
 			<DataTable searchKey="name" columns={columns} data={data} />
